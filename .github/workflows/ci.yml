@@ -43,7 +43,7 @@ jobs:
           pytest --cov=src/tsdataprep --cov-report=xml --cov-report=term-missing -q tests/
 
       - name: Upload coverage report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: coverage-report
