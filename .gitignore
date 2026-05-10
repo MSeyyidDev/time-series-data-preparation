@@ -63,12 +63,16 @@ data/processed/*
 *.duckdb
 *.duckdb.wal
 *.parquet
+# Whitelist small Parquet samples shipped with the demo site
+!site/data/*.parquet
 
 # Generated reports
 reports/figures/*.png
 reports/figures/*.svg
 reports/*.html
 reports/*.json
+# Whitelist demo-site figures (small, web-optimized copies)
+!site/figures/*.png
 
 # Secrets
 secrets.json
