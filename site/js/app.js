@@ -48,10 +48,20 @@ async function initDuckDB() {
   conn = await db.connect();
 
   status('Loading Parquet samples...');
+  // Cast ts to plain TIMESTAMP at view creation: DuckDB-WASM 1.29 ships without
+  // the date_part(VARCHAR, TIMESTAMP WITH TIME ZONE) overload, so extract('hour' FROM ts)
+  // would otherwise fail. The Parquet files store ts as TIMESTAMPTZ (UTC).
   for (const [name, path] of Object.entries(PARQUETS)) {
     const buf = await (await fetch(path)).arrayBuffer();
     await db.registerFileBuffer(`${name}.parquet`, new Uint8Array(buf));
-    await conn.query(`CREATE VIEW ${name} AS SELECT * FROM '${name}.parquet'`);
+    await conn.query(`
+      CREATE VIEW ${name} AS
+      SELECT ts::TIMESTAMP AS ts,
+             open, high, low, close,
+             tick_volume, real_volume,
+             spread_points, spread_pips
+      FROM '${name}.parquet'
+    `);
   }
   status('DuckDB ready. 4 views registered: d1, h4, w1, mn1.');
 }
@@ -213,14 +223,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // Render the 3 charts in sequence (DB init is shared)
-  try {
-    await renderPriceChart();
-    await renderSpreadByHour();
-    await renderMonthlyOHLC();
-  } catch (err) {
-    console.error('Chart render failed:', err);
-    for (const id of ['chart-price', 'chart-spread-hour', 'chart-monthly']) {
+  // Render charts in sequence (DB init is shared) but isolate failures: a broken
+  // query for one chart should not blank the others.
+  const renderers = [
+    ['chart-price',        renderPriceChart],
+    ['chart-spread-hour',  renderSpreadByHour],
+    ['chart-monthly',      renderMonthlyOHLC],
+  ];
+  for (const [id, fn] of renderers) {
+    try {
+      await fn();
+    } catch (err) {
+      console.error(`Chart ${id} failed:`, err);
       const el = document.getElementById(id);
       if (el) el.innerHTML = `<div class="muted small">Chart unavailable: ${String(err.message || err)}</div>`;
     }
