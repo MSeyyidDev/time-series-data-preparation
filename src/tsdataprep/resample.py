@@ -63,6 +63,7 @@ def _cast_dtypes(df: pd.DataFrame) -> pd.DataFrame:
 # Core resample function
 # ---------------------------------------------------------------------------
 
+
 def resample_m1(df_m1: pd.DataFrame, tf: str) -> pd.DataFrame:
     """Resample a cleaned M1 DataFrame to the given timeframe.
 
@@ -95,11 +96,7 @@ def resample_m1(df_m1: pd.DataFrame, tf: str) -> pd.DataFrame:
     if freq is None:
         raise ValueError(f"No frequency defined for timeframe {tf!r}")
 
-    resampled = (
-        df_m1.resample(freq, label="left", closed="left")
-        .agg(AGG_DICT)
-        .dropna(how="all")
-    )
+    resampled = df_m1.resample(freq, label="left", closed="left").agg(AGG_DICT).dropna(how="all")
     # Drop empty bars: rows where all OHLC are NaN after dropna(how='all')
     # (dropna already handles it, but be explicit with open).
     resampled = resampled.dropna(subset=["open"])
@@ -111,6 +108,7 @@ def resample_m1(df_m1: pd.DataFrame, tf: str) -> pd.DataFrame:
 # ---------------------------------------------------------------------------
 # Write helpers
 # ---------------------------------------------------------------------------
+
 
 def _write_parquet(
     df: pd.DataFrame,
@@ -179,6 +177,7 @@ def _df_to_arrow(df: pd.DataFrame) -> pa.Table:
 # DuckDB writer
 # ---------------------------------------------------------------------------
 
+
 def write_duckdb(
     parquet_dir: Path,
     duckdb_path: Path,
@@ -221,10 +220,7 @@ def write_duckdb(
                     )
                 else:
                     glob_path = str(tf_dir).replace("\\", "/") + "/*.parquet"
-                    sql = (
-                        f"CREATE TABLE {table_name} AS "
-                        f"SELECT * FROM read_parquet('{glob_path}')"
-                    )
+                    sql = f"CREATE TABLE {table_name} AS SELECT * FROM read_parquet('{glob_path}')"
 
                 try:
                     con.execute(sql)
@@ -243,6 +239,7 @@ def write_duckdb(
 # ---------------------------------------------------------------------------
 # High-level driver
 # ---------------------------------------------------------------------------
+
 
 def run_resample(
     cfg: Config | None = None,

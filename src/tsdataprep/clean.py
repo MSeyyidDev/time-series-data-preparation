@@ -15,13 +15,14 @@ Scope = Literal["clean_5y", "extended"]
 
 # Date boundaries (inclusive at start, exclusive or inclusive at end per spec)
 _WINDOW_START = pd.Timestamp("2020-01-01", tz="UTC")
-_WINDOW_5Y_END_EXCL = pd.Timestamp("2025-01-01", tz="UTC")         # ts < this
+_WINDOW_5Y_END_EXCL = pd.Timestamp("2025-01-01", tz="UTC")  # ts < this
 _WINDOW_EXT_END_INCL = pd.Timestamp("2026-05-08 23:59:00", tz="UTC")  # ts <= this
 
 
 # ---------------------------------------------------------------------------
 # Step helpers
 # ---------------------------------------------------------------------------
+
 
 def sort_and_dedup(df: pd.DataFrame) -> tuple[pd.DataFrame, int]:
     """Sort by ts ascending, drop exact duplicate timestamps keeping first.
@@ -45,9 +46,14 @@ def drop_ohlc_invalid(df: pd.DataFrame) -> tuple[pd.DataFrame, int]:
     """
     mask_valid = (
         (df["high"] >= df["low"])
-        & (df["open"] >= df["low"]) & (df["open"] <= df["high"])
-        & (df["close"] >= df["low"]) & (df["close"] <= df["high"])
-        & (df["open"] > 0) & (df["high"] > 0) & (df["low"] > 0) & (df["close"] > 0)
+        & (df["open"] >= df["low"])
+        & (df["open"] <= df["high"])
+        & (df["close"] >= df["low"])
+        & (df["close"] <= df["high"])
+        & (df["open"] > 0)
+        & (df["high"] > 0)
+        & (df["low"] > 0)
+        & (df["close"] > 0)
     )
     before = len(df)
     df = df[mask_valid].reset_index(drop=True)
@@ -117,6 +123,7 @@ def trim_to_window(df: pd.DataFrame, scope: Scope) -> tuple[pd.DataFrame, int]:
 # ---------------------------------------------------------------------------
 # Full pipeline
 # ---------------------------------------------------------------------------
+
 
 def clean(
     df: pd.DataFrame,

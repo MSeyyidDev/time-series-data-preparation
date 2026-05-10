@@ -69,8 +69,7 @@ def main(interim_dir: Path | None = None, out_dir: Path | None = None) -> dict:
         logger.warning("No interim Parquet found; waiting up to 3 minutes...")
         if not _wait_for_interim(cfg, timeout=180, interval=10):
             logger.error(
-                "Interim Parquet still missing after timeout. "
-                "Run scripts/02_clean.py first."
+                "Interim Parquet still missing after timeout. Run scripts/02_clean.py first."
             )
             sys.exit(1)
 
@@ -98,6 +97,7 @@ def main(interim_dir: Path | None = None, out_dir: Path | None = None) -> dict:
 
     # DuckDB verification
     import duckdb as _ddb
+
     con = _ddb.connect(str(cfg.duckdb_file), read_only=True)
     tables = con.execute(
         "SELECT table_name FROM information_schema.tables WHERE table_schema='main'"
@@ -113,9 +113,14 @@ def main(interim_dir: Path | None = None, out_dir: Path | None = None) -> dict:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Resample M1 Parquet to all timeframes.")
-    parser.add_argument("--interim", type=Path, default=None,
-                        help="Interim directory (default: data/interim/)")
-    parser.add_argument("--out", type=Path, default=None,
-                        help="Processed output directory (default: data/processed/)")
+    parser.add_argument(
+        "--interim", type=Path, default=None, help="Interim directory (default: data/interim/)"
+    )
+    parser.add_argument(
+        "--out",
+        type=Path,
+        default=None,
+        help="Processed output directory (default: data/processed/)",
+    )
     args = parser.parse_args()
     main(interim_dir=args.interim, out_dir=args.out)

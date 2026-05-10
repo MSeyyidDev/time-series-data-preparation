@@ -57,7 +57,9 @@ def inspect(input_path: str) -> None:
     print(f"| Spread median | {spread.median():.0f} pts |")
     print(f"| Spread p99 | {spread.quantile(0.99):.0f} pts |")
     print(f"| Spread max | {spread.max():.0f} pts |")
-    print(f"| OHLC-invalid bars | {int(((df['<HIGH>'] < df['<LOW>']) | (df['<OPEN>'] <= 0)).sum())} |")
+    print(
+        f"| OHLC-invalid bars | {int(((df['<HIGH>'] < df['<LOW>']) | (df['<OPEN>'] <= 0)).sum())} |"
+    )
 
     gaps = _gap_distribution(ts)
     print(f"| Inter-bar gaps == 1 min | {gaps['gaps_1m']:,} |")
@@ -70,8 +72,10 @@ def inspect(input_path: str) -> None:
     print("|---|---|---|---|")
     top_idx = ret.abs().nlargest(10).index
     for idx in top_idx:
-        print(f"| {ts.iloc[idx]} | {abs(ret.iloc[idx])*100:.4f}% "
-              f"| {spread.iloc[idx]} | {df['<CLOSE>'].iloc[idx]:.2f} |")
+        print(
+            f"| {ts.iloc[idx]} | {abs(ret.iloc[idx]) * 100:.4f}% "
+            f"| {spread.iloc[idx]} | {df['<CLOSE>'].iloc[idx]:.2f} |"
+        )
 
 
 def main() -> None:

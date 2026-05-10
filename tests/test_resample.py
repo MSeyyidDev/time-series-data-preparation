@@ -18,25 +18,29 @@ from tsdataprep.resample import _cast_dtypes, _write_parquet, resample_m1, write
 
 # ── fixtures ──────────────────────────────────────────────────────────────────
 
+
 def _make_m1(n: int = 1440, start: str = "2022-01-03 00:00") -> pd.DataFrame:
     """Create a synthetic M1 DataFrame with n bars."""
     idx = pd.date_range(start, periods=n, freq="1min", tz="UTC", name="ts")
     rng = pd.Series(range(n))
-    df = pd.DataFrame({
-        "ts": idx,
-        "open":  1800.0 + rng * 0.01,
-        "high":  1800.5 + rng * 0.01,
-        "low":   1799.5 + rng * 0.01,
-        "close": 1800.2 + rng * 0.01,
-        "tick_volume":   (50 + rng % 100).astype("int64"),
-        "real_volume":   pd.array([0] * n, dtype="int64"),
-        "spread_points": pd.array([20] * n, dtype="float32"),
-        "spread_pips":   pd.array([2.0] * n, dtype="float32"),
-    })
+    df = pd.DataFrame(
+        {
+            "ts": idx,
+            "open": 1800.0 + rng * 0.01,
+            "high": 1800.5 + rng * 0.01,
+            "low": 1799.5 + rng * 0.01,
+            "close": 1800.2 + rng * 0.01,
+            "tick_volume": (50 + rng % 100).astype("int64"),
+            "real_volume": pd.array([0] * n, dtype="int64"),
+            "spread_points": pd.array([20] * n, dtype="float32"),
+            "spread_pips": pd.array([2.0] * n, dtype="float32"),
+        }
+    )
     return df
 
 
 # ── unit tests ────────────────────────────────────────────────────────────────
+
 
 class TestResampleM1:
     """resample_m1 unit tests."""
@@ -75,16 +79,23 @@ class TestResampleM1:
         prev = None
         for tf in tfs_to_test:
             if prev is not None:
-                assert counts[tf] <= prev, (
-                    f"{tf} ({counts[tf]}) > previous ({prev})"
-                )
+                assert counts[tf] <= prev, f"{tf} ({counts[tf]}) > previous ({prev})"
             prev = counts[tf]
 
     def test_output_columns(self) -> None:
         df = _make_m1(100)
         out = resample_m1(df.copy(), "H1")
-        expected = {"ts", "open", "high", "low", "close",
-                    "tick_volume", "real_volume", "spread_points", "spread_pips"}
+        expected = {
+            "ts",
+            "open",
+            "high",
+            "low",
+            "close",
+            "tick_volume",
+            "real_volume",
+            "spread_points",
+            "spread_pips",
+        }
         assert expected.issubset(set(out.columns))
 
     def test_high_ge_low(self) -> None:
@@ -151,6 +162,7 @@ class TestWriteParquet:
 
     def test_roundtrip(self, tmp_path: Path) -> None:
         import pyarrow.parquet as pq
+
         df = _make_m1(1440)
         _write_parquet(df, tmp_path, "H1")
         loaded = pq.read_table(str(tmp_path)).to_pandas()
@@ -160,7 +172,7 @@ class TestWriteParquet:
 @pytest.mark.skipif(
     sys.platform == "win32" and sys.version_info >= (3, 13),
     reason="DuckDB 1.3.x triggers a Windows access violation on Python 3.13 during pytest "
-           "tmp_path teardown. Real pipeline runs (Python 3.11 in Docker / CI) are unaffected.",
+    "tmp_path teardown. Real pipeline runs (Python 3.11 in Docker / CI) are unaffected.",
 )
 class TestWriteDuckDB:
     """write_duckdb integration test with synthetic Parquet."""
@@ -181,6 +193,7 @@ class TestWriteDuckDB:
         assert "xauusd_h1_clean_5y" in tables
 
         import duckdb
+
         con = duckdb.connect(str(db_path), read_only=True)
         cnt = con.execute("SELECT COUNT(*) FROM xauusd_h1_clean_5y").fetchone()[0]
         con.close()

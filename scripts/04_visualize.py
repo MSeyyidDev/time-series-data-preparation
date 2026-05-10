@@ -85,9 +85,14 @@ def main(parquet_dir: Path | None = None, out_dir: Path | None = None) -> None:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate figures and HTML report.")
-    parser.add_argument("--parquet", type=Path, default=None,
-                        help="Parquet base directory (default: data/processed/parquet/)")
-    parser.add_argument("--out", type=Path, default=None,
-                        help="Report output directory (default: reports/)")
+    parser.add_argument(
+        "--parquet",
+        type=Path,
+        default=None,
+        help="Parquet base directory (default: data/processed/parquet/)",
+    )
+    parser.add_argument(
+        "--out", type=Path, default=None, help="Report output directory (default: reports/)"
+    )
     args = parser.parse_args()
     main(parquet_dir=args.parquet, out_dir=args.out)

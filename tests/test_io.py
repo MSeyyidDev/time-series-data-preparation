@@ -21,6 +21,7 @@ from tsdataprep.io import (
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _make_minimal_csv(tmp_path: Path) -> Path:
     """Write a tiny valid MT5-format TSV and return its path."""
     content = (
@@ -36,22 +37,25 @@ def _make_minimal_csv(tmp_path: Path) -> Path:
 def _make_canonical_df() -> pd.DataFrame:
     """Return a small canonical-schema DataFrame."""
     ts = pd.to_datetime(["2022-01-03 10:00:00", "2022-01-03 10:01:00"]).tz_localize("UTC")
-    return pd.DataFrame({
-        "ts": ts,
-        "open":  [1800.0, 1800.5],
-        "high":  [1801.0, 1802.0],
-        "low":   [1799.0, 1800.0],
-        "close": [1800.5, 1801.0],
-        "tick_volume":  pd.array([100, 120], dtype="int64"),
-        "real_volume":  pd.array([0, 0],   dtype="int64"),
-        "spread_points": pd.array([50, 50], dtype="int32"),
-        "spread_pips": pd.array([5.0, 5.0], dtype="float32"),
-    })
+    return pd.DataFrame(
+        {
+            "ts": ts,
+            "open": [1800.0, 1800.5],
+            "high": [1801.0, 1802.0],
+            "low": [1799.0, 1800.0],
+            "close": [1800.5, 1801.0],
+            "tick_volume": pd.array([100, 120], dtype="int64"),
+            "real_volume": pd.array([0, 0], dtype="int64"),
+            "spread_points": pd.array([50, 50], dtype="int32"),
+            "spread_pips": pd.array([5.0, 5.0], dtype="float32"),
+        }
+    )
 
 
 # ---------------------------------------------------------------------------
 # Tests: load_raw_csv
 # ---------------------------------------------------------------------------
+
 
 class TestLoadRawCsv:
     def test_returns_dataframe(self, tmp_path):
@@ -84,6 +88,7 @@ class TestLoadRawCsv:
 # ---------------------------------------------------------------------------
 # Tests: write_parquet / read_parquet
 # ---------------------------------------------------------------------------
+
 
 class TestParquetRoundTrip:
     def test_roundtrip_row_count(self, tmp_path):
@@ -135,6 +140,7 @@ class TestParquetRoundTrip:
 # ---------------------------------------------------------------------------
 # Tests: compute_file_sha256
 # ---------------------------------------------------------------------------
+
 
 class TestSha256:
     def test_known_hash(self, tmp_path):

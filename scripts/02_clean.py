@@ -36,6 +36,7 @@ from tsdataprep.validate import validate
 def _package_versions() -> dict[str, str]:
     """Collect relevant package versions for reproducibility."""
     import importlib.metadata as im
+
     versions: dict[str, str] = {}
     for pkg in ["pandas", "pyarrow", "numpy", "duckdb"]:
         try:
@@ -144,9 +145,11 @@ def run(
     # Summary
     print("\n--- Summary ---")
     for scope, info in scopes_out.items():
-        print(f"  {scope}: {info['output_rows']:,} rows, "
-              f"median_spread_pips={info['median_spread_pips']:.3f}, "
-              f"size={info['parquet_size_mb']} MB")
+        print(
+            f"  {scope}: {info['output_rows']:,} rows, "
+            f"median_spread_pips={info['median_spread_pips']:.3f}, "
+            f"size={info['parquet_size_mb']} MB"
+        )
         for reason, cnt in info["dropped_by_reason"].items():
             if cnt:
                 print(f"    dropped[{reason}]={cnt:,}")
@@ -157,7 +160,9 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Clean XAUUSD M1 data")
     parser.add_argument("--input", required=True, help="Path to raw CSV")
     parser.add_argument("--out-interim", default="data/interim", help="Interim Parquet directory")
-    parser.add_argument("--out-processed", default="data/processed", help="Processed JSON directory")
+    parser.add_argument(
+        "--out-processed", default="data/processed", help="Processed JSON directory"
+    )
     args = parser.parse_args()
 
     run(

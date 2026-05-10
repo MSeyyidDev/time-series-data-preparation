@@ -45,6 +45,7 @@ CANONICAL_DTYPES: dict[str, str] = {
 # Core fixture: deterministic 10k-row synthetic M1 DataFrame
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture(scope="session")
 def synthetic_m1_df() -> pd.DataFrame:
     """Return a deterministic 10 000-row synthetic XAUUSD M1 DataFrame.
@@ -110,6 +111,7 @@ def synthetic_m1_df() -> pd.DataFrame:
 # Fixture: temporary data directory (unique per test)
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture()
 def tmp_data_dir(tmp_path: Path) -> Path:
     """Return a temporary directory pre-populated with the expected sub-folders.
@@ -127,6 +129,7 @@ def tmp_data_dir(tmp_path: Path) -> Path:
 # ---------------------------------------------------------------------------
 # Fixture: path to the committed sample CSV fixture
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture(scope="session")
 def sample_csv_path() -> Path:

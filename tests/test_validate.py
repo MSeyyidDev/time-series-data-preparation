@@ -18,26 +18,30 @@ from tsdataprep.validate import validate
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _make_valid_df(n: int = 20, spread_pips: float = 2.0) -> pd.DataFrame:
     """Return a small fully-valid canonical DataFrame."""
     ts = pd.date_range("2022-01-03 10:00:00", periods=n, freq="1min", tz="UTC")
     base = 1800.0
-    return pd.DataFrame({
-        "ts": ts,
-        "open":  [base] * n,
-        "high":  [base + 1.0] * n,
-        "low":   [base - 1.0] * n,
-        "close": [base + 0.5] * n,
-        "tick_volume": np.ones(n, dtype="int64") * 100,
-        "real_volume": np.zeros(n, dtype="int64"),
-        "spread_points": pd.array([int(spread_pips * 10)] * n, dtype="int32"),
-        "spread_pips": pd.array([spread_pips] * n, dtype="float32"),
-    })
+    return pd.DataFrame(
+        {
+            "ts": ts,
+            "open": [base] * n,
+            "high": [base + 1.0] * n,
+            "low": [base - 1.0] * n,
+            "close": [base + 0.5] * n,
+            "tick_volume": np.ones(n, dtype="int64") * 100,
+            "real_volume": np.zeros(n, dtype="int64"),
+            "spread_points": pd.array([int(spread_pips * 10)] * n, dtype="int32"),
+            "spread_pips": pd.array([spread_pips] * n, dtype="float32"),
+        }
+    )
 
 
 # ---------------------------------------------------------------------------
 # Happy-path
 # ---------------------------------------------------------------------------
+
 
 class TestValidateHappy:
     def test_returns_dict(self):
@@ -75,6 +79,7 @@ class TestValidateHappy:
 # ---------------------------------------------------------------------------
 # Hard violation tests
 # ---------------------------------------------------------------------------
+
 
 class TestValidateHardViolations:
     def test_missing_column_raises(self):
@@ -116,6 +121,7 @@ class TestValidateHardViolations:
 # ---------------------------------------------------------------------------
 # Soft warning tests
 # ---------------------------------------------------------------------------
+
 
 class TestValidateSoftWarnings:
     def test_spread_too_high_warns(self):

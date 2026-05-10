@@ -23,17 +23,19 @@ _RAW_DTYPES: dict[str, str] = {
 }
 
 # PyArrow schema matching the canonical normalized schema
-PARQUET_SCHEMA = pa.schema([
-    pa.field("ts", pa.timestamp("ns", tz="UTC")),
-    pa.field("open", pa.float64()),
-    pa.field("high", pa.float64()),
-    pa.field("low", pa.float64()),
-    pa.field("close", pa.float64()),
-    pa.field("tick_volume", pa.int64()),
-    pa.field("real_volume", pa.int64()),
-    pa.field("spread_points", pa.int32()),
-    pa.field("spread_pips", pa.float32()),
-])
+PARQUET_SCHEMA = pa.schema(
+    [
+        pa.field("ts", pa.timestamp("ns", tz="UTC")),
+        pa.field("open", pa.float64()),
+        pa.field("high", pa.float64()),
+        pa.field("low", pa.float64()),
+        pa.field("close", pa.float64()),
+        pa.field("tick_volume", pa.int64()),
+        pa.field("real_volume", pa.int64()),
+        pa.field("spread_points", pa.int32()),
+        pa.field("spread_pips", pa.float32()),
+    ]
+)
 
 _CHUNK_SIZE = 1024 * 1024  # 1 MB for SHA-256 streaming
 

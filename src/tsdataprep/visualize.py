@@ -58,10 +58,13 @@ def _apply_style() -> None:
 
 def _add_caption(fig: plt.Figure) -> None:
     fig.text(
-        0.99, 0.01,
+        0.99,
+        0.01,
         DATA_SOURCE_CAPTION,
-        ha="right", va="bottom",
-        fontsize=7, color="#6B7280",
+        ha="right",
+        va="bottom",
+        fontsize=7,
+        color="#6B7280",
         transform=fig.transFigure,
     )
 
@@ -69,6 +72,7 @@ def _add_caption(fig: plt.Figure) -> None:
 # ---------------------------------------------------------------------------
 # Data loaders
 # ---------------------------------------------------------------------------
+
 
 def _load_tf_scope(parquet_dir: Path, scope: str, tf: str) -> pd.DataFrame | None:
     """Load a timeframe/scope Parquet into a DataFrame; return None if missing."""
@@ -96,7 +100,17 @@ def _load_raw_m1(raw_csv: Path) -> pd.DataFrame | None:
         df = pd.read_csv(
             raw_csv,
             sep="\t",
-            names=["date", "time", "open", "high", "low", "close", "tick_volume", "real_volume", "spread_points"],
+            names=[
+                "date",
+                "time",
+                "open",
+                "high",
+                "low",
+                "close",
+                "tick_volume",
+                "real_volume",
+                "spread_points",
+            ],
             header=0,
         )
         ts_str = df["date"].str.replace(".", "-", regex=False) + " " + df["time"]
@@ -115,6 +129,7 @@ def _load_raw_m1(raw_csv: Path) -> pd.DataFrame | None:
 # ---------------------------------------------------------------------------
 # Figure 1 -- price overview
 # ---------------------------------------------------------------------------
+
 
 def fig_price_overview(parquet_dir: Path, out_path: Path) -> None:
     """Close price line for 'extended' scope, log y, weekly down-sample."""
@@ -145,6 +160,7 @@ def fig_price_overview(parquet_dir: Path, out_path: Path) -> None:
 # ---------------------------------------------------------------------------
 # Figure 2 -- spread before / after
 # ---------------------------------------------------------------------------
+
 
 def fig_spread_before_after(
     parquet_dir: Path,
@@ -177,12 +193,28 @@ def fig_spread_before_after(
     if df_raw is not None and "spread_points" in df_raw.columns:
         _plot_hist(axes[0], df_raw["spread_points"], _COLORS["raw"], "Raw data")
     else:
-        axes[0].text(0.5, 0.5, "Raw data\nnot available", ha="center", va="center", transform=axes[0].transAxes)
+        axes[0].text(
+            0.5,
+            0.5,
+            "Raw data\nnot available",
+            ha="center",
+            va="center",
+            transform=axes[0].transAxes,
+        )
 
     if df_clean is not None and "spread_points" in df_clean.columns:
-        _plot_hist(axes[1], df_clean["spread_points"].astype(float), _COLORS["cleaned"], "Cleaned data")
+        _plot_hist(
+            axes[1], df_clean["spread_points"].astype(float), _COLORS["cleaned"], "Cleaned data"
+        )
     else:
-        axes[1].text(0.5, 0.5, "Cleaned data\nnot available", ha="center", va="center", transform=axes[1].transAxes)
+        axes[1].text(
+            0.5,
+            0.5,
+            "Cleaned data\nnot available",
+            ha="center",
+            va="center",
+            transform=axes[1].transAxes,
+        )
 
     axes[0].set_title("Raw: Spread Distribution")
     axes[1].set_title("Cleaned: Spread Distribution")
@@ -197,6 +229,7 @@ def fig_spread_before_after(
 # ---------------------------------------------------------------------------
 # Figure 3 -- spread_pips by hour
 # ---------------------------------------------------------------------------
+
 
 def fig_spread_pips_by_hour(parquet_dir: Path, out_path: Path) -> None:
     """Boxplot of spread_pips by hour of day (cleaned M1)."""
@@ -237,6 +270,7 @@ def fig_spread_pips_by_hour(parquet_dir: Path, out_path: Path) -> None:
 # Figure 4 -- gap heatmap
 # ---------------------------------------------------------------------------
 
+
 def fig_gap_heatmap(parquet_dir: Path, out_path: Path) -> None:
     """Heatmap: day-of-week x hour-of-day showing 1 - bar_present_ratio."""
     df = _load_tf_scope(parquet_dir, "extended", "M1")
@@ -245,7 +279,7 @@ def fig_gap_heatmap(parquet_dir: Path, out_path: Path) -> None:
         return
 
     df = df.copy()
-    df["dow"] = df["ts"].dt.dayofweek   # 0=Mon, 6=Sun
+    df["dow"] = df["ts"].dt.dayofweek  # 0=Mon, 6=Sun
     df["hour"] = df["ts"].dt.hour
 
     # Expected minutes per cell ≈ (total weeks) * 60
@@ -275,7 +309,8 @@ def fig_gap_heatmap(parquet_dir: Path, out_path: Path) -> None:
         gap_ratio.values,
         aspect="auto",
         cmap="YlOrRd",
-        vmin=0, vmax=1,
+        vmin=0,
+        vmax=1,
         origin="upper",
     )
     plt.colorbar(im, ax=ax, label="Gap ratio (1 = always missing)")
@@ -296,6 +331,7 @@ def fig_gap_heatmap(parquet_dir: Path, out_path: Path) -> None:
 # ---------------------------------------------------------------------------
 # Figure 5 -- rows per timeframe
 # ---------------------------------------------------------------------------
+
 
 def fig_rows_per_timeframe(
     row_counts: dict[str, dict[str, int]],
@@ -337,6 +373,7 @@ def fig_rows_per_timeframe(
 # Figure 6 -- flash crash
 # ---------------------------------------------------------------------------
 
+
 def fig_flash_crash(
     parquet_dir: Path,
     raw_csv: Path,
@@ -367,11 +404,17 @@ def fig_flash_crash(
     fig, ax = plt.subplots(figsize=(12, 4))
 
     if w_raw is not None and not w_raw.empty:
-        ax.plot(w_raw["ts"], w_raw["close"], color=_COLORS["raw"], linewidth=0.8,
-                alpha=0.7, label="Raw")
+        ax.plot(
+            w_raw["ts"], w_raw["close"], color=_COLORS["raw"], linewidth=0.8, alpha=0.7, label="Raw"
+        )
     if w_clean is not None and not w_clean.empty:
-        ax.plot(w_clean["ts"], w_clean["close"], color=_COLORS["cleaned"],
-                linewidth=1.0, label="Cleaned")
+        ax.plot(
+            w_clean["ts"],
+            w_clean["close"],
+            color=_COLORS["cleaned"],
+            linewidth=1.0,
+            label="Cleaned",
+        )
 
     ax.set_xlabel("Time (UTC)")
     ax.set_ylabel("XAUUSD Close (USD/oz)")
@@ -387,6 +430,7 @@ def fig_flash_crash(
 # ---------------------------------------------------------------------------
 # HTML report (plotly)
 # ---------------------------------------------------------------------------
+
 
 def build_html_report(
     parquet_dir: Path,
@@ -413,11 +457,15 @@ def build_html_report(
 
     if df_w1 is not None and not df_w1.empty:
         fig1 = go.Figure()
-        fig1.add_trace(go.Scatter(
-            x=df_w1["ts"], y=df_w1["close"],
-            mode="lines", name="Close",
-            line={"color": "#2563EB", "width": 1},
-        ))
+        fig1.add_trace(
+            go.Scatter(
+                x=df_w1["ts"],
+                y=df_w1["close"],
+                mode="lines",
+                name="Close",
+                line={"color": "#2563EB", "width": 1},
+            )
+        )
         fig1.update_layout(
             title="XAUUSD Close Price -- 2020 to 2026-05 (log scale)",
             xaxis_title="Date (UTC)",
@@ -425,16 +473,20 @@ def build_html_report(
             yaxis_type="log",
             template="simple_white",
             height=450,
-            annotations=[{
-                "text": DATA_SOURCE_CAPTION,
-                "xref": "paper", "yref": "paper",
-                "x": 1.0, "y": -0.12,
-                "showarrow": False,
-                "font": {"size": 9, "color": "gray"},
-            }],
+            annotations=[
+                {
+                    "text": DATA_SOURCE_CAPTION,
+                    "xref": "paper",
+                    "yref": "paper",
+                    "x": 1.0,
+                    "y": -0.12,
+                    "showarrow": False,
+                    "font": {"size": 9, "color": "gray"},
+                }
+            ],
         )
         figures_html_parts.append(
-            '<h2>1. XAUUSD Price Overview (Weekly, Extended Scope)</h2>'
+            "<h2>1. XAUUSD Price Overview (Weekly, Extended Scope)</h2>"
             + pio.to_html(fig1, full_html=False, include_plotlyjs=False)
         )
 
@@ -446,25 +498,41 @@ def build_html_report(
     if df_raw is not None and "spread_points" in df_raw.columns:
         sp_raw = df_raw["spread_points"].clip(0, df_raw["spread_points"].quantile(0.999))
         fig2.add_trace(
-            go.Histogram(x=sp_raw, nbinsx=100, name="Raw", marker_color="#DC2626",
-                         opacity=0.75),
-            row=1, col=1,
+            go.Histogram(x=sp_raw, nbinsx=100, name="Raw", marker_color="#DC2626", opacity=0.75),
+            row=1,
+            col=1,
         )
         p99_raw = df_raw["spread_points"].quantile(0.99)
-        fig2.add_vline(x=p99_raw, line_dash="dash", line_color="black",
-                       annotation_text=f"p99={p99_raw:.0f}", row=1, col=1)
+        fig2.add_vline(
+            x=p99_raw,
+            line_dash="dash",
+            line_color="black",
+            annotation_text=f"p99={p99_raw:.0f}",
+            row=1,
+            col=1,
+        )
     if df_m1 is not None and "spread_points" in df_m1.columns:
-        sp_clean = df_m1["spread_points"].astype(float).clip(
-            0, df_m1["spread_points"].astype(float).quantile(0.999)
+        sp_clean = (
+            df_m1["spread_points"]
+            .astype(float)
+            .clip(0, df_m1["spread_points"].astype(float).quantile(0.999))
         )
         fig2.add_trace(
-            go.Histogram(x=sp_clean, nbinsx=100, name="Cleaned", marker_color="#2563EB",
-                         opacity=0.75),
-            row=1, col=2,
+            go.Histogram(
+                x=sp_clean, nbinsx=100, name="Cleaned", marker_color="#2563EB", opacity=0.75
+            ),
+            row=1,
+            col=2,
         )
         p99_cl = df_m1["spread_points"].astype(float).quantile(0.99)
-        fig2.add_vline(x=p99_cl, line_dash="dash", line_color="black",
-                       annotation_text=f"p99={p99_cl:.0f}", row=1, col=2)
+        fig2.add_vline(
+            x=p99_cl,
+            line_dash="dash",
+            line_color="black",
+            annotation_text=f"p99={p99_cl:.0f}",
+            row=1,
+            col=2,
+        )
     fig2.update_layout(
         title="Spread Distribution Before and After Cleaning",
         yaxis_type="log",
@@ -474,7 +542,7 @@ def build_html_report(
         showlegend=True,
     )
     figures_html_parts.append(
-        '<h2>2. Spread Distribution Before vs After Cleaning</h2>'
+        "<h2>2. Spread Distribution Before vs After Cleaning</h2>"
         + pio.to_html(fig2, full_html=False, include_plotlyjs=False)
     )
 
@@ -485,12 +553,16 @@ def build_html_report(
         fig3 = go.Figure()
         for h in range(24):
             vals = df_h.loc[df_h["hour"] == h, "spread_pips"].dropna().values
-            fig3.add_trace(go.Box(
-                y=vals, name=f"{h:02d}",
-                marker_color="#2563EB", opacity=0.6,
-                showlegend=False,
-                boxpoints=False,
-            ))
+            fig3.add_trace(
+                go.Box(
+                    y=vals,
+                    name=f"{h:02d}",
+                    marker_color="#2563EB",
+                    opacity=0.6,
+                    showlegend=False,
+                    boxpoints=False,
+                )
+            )
         fig3.update_layout(
             title="XAUUSD Spread (pips) by Hour of Day -- Cleaned M1",
             xaxis_title="Hour of Day (UTC)",
@@ -499,7 +571,7 @@ def build_html_report(
             height=430,
         )
         figures_html_parts.append(
-            '<h2>3. Spread (pips) by Hour of Day</h2>'
+            "<h2>3. Spread (pips) by Hour of Day</h2>"
             + pio.to_html(fig3, full_html=False, include_plotlyjs=False)
         )
 
@@ -515,8 +587,9 @@ def build_html_report(
             if tf == "M1" and df_m1 is not None and "spread_pips" in df_m1.columns:
                 med_spread = f"{df_m1['spread_pips'].median():.2f}"
             table_rows += (
-                f"<tr><td>{scope}</td><td>{tf}</td>"
-                f"<td>{cnt:,}" if isinstance(cnt, int) else f"<td>{cnt}"
+                f"<tr><td>{scope}</td><td>{tf}</td><td>{cnt:,}"
+                if isinstance(cnt, int)
+                else f"<td>{cnt}"
             )
             table_rows += f"</td><td>{med_spread}</td></tr>\n"
 
@@ -563,6 +636,7 @@ def build_html_report(
 # ---------------------------------------------------------------------------
 # High-level driver
 # ---------------------------------------------------------------------------
+
 
 def run_visualize(
     cfg: Config | None = None,

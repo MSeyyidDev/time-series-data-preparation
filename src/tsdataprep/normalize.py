@@ -45,7 +45,7 @@ def build_utc_ts(df: pd.DataFrame) -> pd.Series:
 def rename_columns(df: pd.DataFrame) -> pd.DataFrame:
     """Rename stripped MT5 column names to the canonical schema."""
     rename_map = {
-        "DATE": "DATE",   # kept temporarily for ts construction
+        "DATE": "DATE",  # kept temporarily for ts construction
         "TIME": "TIME",
         "OPEN": "open",
         "HIGH": "high",
@@ -97,7 +97,16 @@ def normalize(df: pd.DataFrame) -> pd.DataFrame:
     # Enforce dtypes
     df = enforce_dtypes(df)
     # Reorder columns to canonical order
-    col_order = ["ts", "open", "high", "low", "close",
-                 "tick_volume", "real_volume", "spread_points", "spread_pips"]
+    col_order = [
+        "ts",
+        "open",
+        "high",
+        "low",
+        "close",
+        "tick_volume",
+        "real_volume",
+        "spread_points",
+        "spread_pips",
+    ]
     df = df[col_order].reset_index(drop=True)
     return df

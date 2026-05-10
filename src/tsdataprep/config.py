@@ -24,7 +24,7 @@ AGG_DICT: dict[str, str] = {
 
 #: Mapping from short timeframe label -> pandas offset alias.
 FREQ_MAP: dict[str, str] = {
-    "M1": None,   # pass-through, not resampled
+    "M1": None,  # pass-through, not resampled
     "M5": "5min",
     "M15": "15min",
     "H1": "1h",
@@ -56,14 +56,13 @@ ALL_SCOPES: list[str] = ["clean_5y", "extended"]
 # Data citation
 # ---------------------------------------------------------------------------
 
-DATA_SOURCE_CAPTION = (
-    "Source: MetaQuotes-Demo XAUUSD M1, 2020-01 to 2026-05"
-)
+DATA_SOURCE_CAPTION = "Source: MetaQuotes-Demo XAUUSD M1, 2020-01 to 2026-05"
 
 
 # ---------------------------------------------------------------------------
 # Config dataclass
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class Config:
@@ -71,13 +70,13 @@ class Config:
 
     # --- paths ---
     project_root: Path = field(default_factory=lambda: _default_project_root())
-    raw_csv: Path = field(default=None)             # type: ignore[assignment]
-    interim_dir: Path = field(default=None)         # type: ignore[assignment]
-    processed_dir: Path = field(default=None)       # type: ignore[assignment]
-    parquet_dir: Path = field(default=None)         # type: ignore[assignment]
-    duckdb_file: Path = field(default=None)         # type: ignore[assignment]
-    reports_dir: Path = field(default=None)         # type: ignore[assignment]
-    figures_dir: Path = field(default=None)         # type: ignore[assignment]
+    raw_csv: Path = field(default=None)  # type: ignore[assignment]
+    interim_dir: Path = field(default=None)  # type: ignore[assignment]
+    processed_dir: Path = field(default=None)  # type: ignore[assignment]
+    parquet_dir: Path = field(default=None)  # type: ignore[assignment]
+    duckdb_file: Path = field(default=None)  # type: ignore[assignment]
+    reports_dir: Path = field(default=None)  # type: ignore[assignment]
+    figures_dir: Path = field(default=None)  # type: ignore[assignment]
 
     # --- pipeline params ---
     scopes: list[str] = field(default_factory=lambda: list(ALL_SCOPES))
@@ -123,6 +122,7 @@ class Config:
 # ---------------------------------------------------------------------------
 # Internal helpers
 # ---------------------------------------------------------------------------
+
 
 def _default_project_root() -> Path:
     """Resolve the project root: walk up from this file until we find SHARED_SPEC.md."""

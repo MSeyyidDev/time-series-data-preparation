@@ -27,21 +27,24 @@ from tsdataprep.visualize import (  # noqa: E402
 
 # ── fixtures ──────────────────────────────────────────────────────────────────
 
+
 def _make_m1_full_year(n: int = 10_080) -> pd.DataFrame:
     """Create ~1 week of synthetic M1 data spanning 2021-08-08."""
     idx = pd.date_range("2021-08-08 12:00", periods=n, freq="1min", tz="UTC", name="ts")
     rng = pd.Series(range(n))
-    return pd.DataFrame({
-        "ts": idx,
-        "open":  1800.0 + rng * 0.001,
-        "high":  1800.5 + rng * 0.001,
-        "low":   1799.5 + rng * 0.001,
-        "close": 1800.2 + rng * 0.001,
-        "tick_volume":   (50 + rng % 100).astype("int64"),
-        "real_volume":   pd.array([0] * n, dtype="int64"),
-        "spread_points": pd.array([20] * n, dtype="float32"),
-        "spread_pips":   pd.array([2.0] * n, dtype="float32"),
-    })
+    return pd.DataFrame(
+        {
+            "ts": idx,
+            "open": 1800.0 + rng * 0.001,
+            "high": 1800.5 + rng * 0.001,
+            "low": 1799.5 + rng * 0.001,
+            "close": 1800.2 + rng * 0.001,
+            "tick_volume": (50 + rng % 100).astype("int64"),
+            "real_volume": pd.array([0] * n, dtype="int64"),
+            "spread_points": pd.array([20] * n, dtype="float32"),
+            "spread_pips": pd.array([2.0] * n, dtype="float32"),
+        }
+    )
 
 
 def _build_parquet_tree(parquet_dir: Path, scope: str = "extended") -> dict[str, int]:
@@ -57,6 +60,7 @@ def _build_parquet_tree(parquet_dir: Path, scope: str = "extended") -> dict[str,
 
 
 # ── tests ─────────────────────────────────────────────────────────────────────
+
 
 class TestFigPriceOverview:
     def test_produces_png(self, tmp_path: Path) -> None:

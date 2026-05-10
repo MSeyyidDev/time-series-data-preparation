@@ -34,6 +34,7 @@ logger = logging.getLogger("tsdataprep.cli")
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _scope_list(scope: str) -> list[str]:
     if scope == "both":
         return list(ALL_SCOPES)
@@ -47,6 +48,7 @@ def _scope_list(scope: str) -> list[str]:
 # ---------------------------------------------------------------------------
 # inspect
 # ---------------------------------------------------------------------------
+
 
 @app.command("inspect")
 def cmd_inspect(
@@ -66,6 +68,7 @@ def cmd_inspect(
     # Try to import from Agent 1's module if available, else fallback
     try:
         from tsdataprep.io import read_raw_csv  # Agent 1
+
         df = read_raw_csv(input)
     except ImportError:
         # Agent 1 not yet written; do basic inspection ourselves
@@ -95,6 +98,7 @@ def cmd_inspect(
 # clean
 # ---------------------------------------------------------------------------
 
+
 @app.command("clean")
 def cmd_clean(
     input: Path = typer.Option(..., "--input", help="Path to raw M1 CSV file."),
@@ -108,6 +112,7 @@ def cmd_clean(
     try:
         # Try to import Agent 1's clean script logic
         import importlib.util
+
         project_root = Path(__file__).resolve().parent.parent.parent.parent
         script_path = project_root / "scripts" / "02_clean.py"
         if script_path.exists():
@@ -119,12 +124,12 @@ def cmd_clean(
                 return
         # Fallback: call Agent 1 module if importable
         from tsdataprep.clean import clean_pipeline  # Agent 1  # type: ignore[import]
+
         for s in scopes:
             clean_pipeline(input, out, scope=s)
     except (ImportError, ModuleNotFoundError) as exc:
         console.print(
-            "[yellow]Agent 1 clean module not available. "
-            "Run scripts/02_clean.py directly.[/yellow]"
+            "[yellow]Agent 1 clean module not available. Run scripts/02_clean.py directly.[/yellow]"
         )
         raise typer.Exit(1) from exc
 
@@ -135,14 +140,17 @@ def cmd_clean(
 # resample
 # ---------------------------------------------------------------------------
 
+
 @app.command("resample")
 def cmd_resample(
     input: Path = typer.Option(
-        ..., "--input",
+        ...,
+        "--input",
         help="Directory containing cleaned M1 Parquet (data/interim/).",
     ),
     out: Path = typer.Option(
-        ..., "--out",
+        ...,
+        "--out",
         help="Output base directory (data/processed/).",
     ),
 ) -> None:
@@ -176,6 +184,7 @@ def cmd_resample(
 # export
 # ---------------------------------------------------------------------------
 
+
 @app.command("export")
 def cmd_export(
     parquet: Path = typer.Option(..., "--parquet", help="Parquet base directory."),
@@ -197,6 +206,7 @@ def cmd_export(
 # ---------------------------------------------------------------------------
 # visualize
 # ---------------------------------------------------------------------------
+
 
 @app.command("visualize")
 def cmd_visualize(
@@ -223,6 +233,7 @@ def cmd_visualize(
 # run-all
 # ---------------------------------------------------------------------------
 
+
 @app.command("run-all")
 def cmd_run_all(
     input: Path = typer.Option(..., "--input", help="Path to raw M1 CSV file."),
@@ -239,9 +250,9 @@ def cmd_run_all(
     clean_script = project_root / "scripts" / "02_clean.py"
     if clean_script.exists():
         import subprocess
+
         result = subprocess.run(
-            [sys.executable, str(clean_script),
-             "--input", str(input), "--out", str(interim_dir)],
+            [sys.executable, str(clean_script), "--input", str(input), "--out", str(interim_dir)],
             capture_output=False,
         )
         if result.returncode != 0:
@@ -277,6 +288,7 @@ def cmd_run_all(
 # ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
+
 
 def main() -> None:
     """Entry point registered via pyproject.toml [project.scripts]."""

@@ -27,6 +27,7 @@ from tsdataprep.clean import (
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _ts(s: str) -> pd.Timestamp:
     return pd.Timestamp(s, tz="UTC")
 
@@ -34,8 +35,14 @@ def _ts(s: str) -> pd.Timestamp:
 def _make_df(rows: list[dict]) -> pd.DataFrame:
     """Build a minimal canonical-schema DataFrame from a list of row dicts."""
     defaults = {
-        "open": 1800.0, "high": 1801.0, "low": 1799.0, "close": 1800.5,
-        "tick_volume": 100, "real_volume": 0, "spread_points": 50, "spread_pips": 5.0,
+        "open": 1800.0,
+        "high": 1801.0,
+        "low": 1799.0,
+        "close": 1800.5,
+        "tick_volume": 100,
+        "real_volume": 0,
+        "spread_points": 50,
+        "spread_pips": 5.0,
     }
     data = []
     for r in rows:
@@ -54,22 +61,25 @@ def _make_clean_df(n: int = 10, start: str = "2022-01-03 10:00:00") -> pd.DataFr
     """Generate n sequential M1 bars starting at `start`."""
     ts = pd.date_range(start=start, periods=n, freq="1min", tz="UTC")
     base = 1800.0
-    return pd.DataFrame({
-        "ts": ts,
-        "open":  [base + 0.1 * i for i in range(n)],
-        "high":  [base + 0.2 * i + 1 for i in range(n)],
-        "low":   [base + 0.1 * i - 1 for i in range(n)],
-        "close": [base + 0.15 * i for i in range(n)],
-        "tick_volume": np.ones(n, dtype="int64") * 100,
-        "real_volume": np.zeros(n, dtype="int64"),
-        "spread_points": pd.array([50] * n, dtype="int32"),
-        "spread_pips": pd.array([5.0] * n, dtype="float32"),
-    })
+    return pd.DataFrame(
+        {
+            "ts": ts,
+            "open": [base + 0.1 * i for i in range(n)],
+            "high": [base + 0.2 * i + 1 for i in range(n)],
+            "low": [base + 0.1 * i - 1 for i in range(n)],
+            "close": [base + 0.15 * i for i in range(n)],
+            "tick_volume": np.ones(n, dtype="int64") * 100,
+            "real_volume": np.zeros(n, dtype="int64"),
+            "spread_points": pd.array([50] * n, dtype="int32"),
+            "spread_pips": pd.array([5.0] * n, dtype="float32"),
+        }
+    )
 
 
 # ---------------------------------------------------------------------------
 # sort_and_dedup
 # ---------------------------------------------------------------------------
+
 
 class TestSortAndDedup:
     def test_sorts_ascending(self):
@@ -112,6 +122,7 @@ class TestSortAndDedup:
 # drop_ohlc_invalid
 # ---------------------------------------------------------------------------
 
+
 class TestDropOhlcInvalid:
     def test_drops_high_lt_low(self):
         rows = [
@@ -149,6 +160,7 @@ class TestDropOhlcInvalid:
 # drop_spread_outliers
 # ---------------------------------------------------------------------------
 
+
 class TestDropSpreadOutliers:
     def test_drops_above_p99_per_year(self):
         # Create 200 bars in 2022 with spread=50, then add one spike
@@ -156,17 +168,19 @@ class TestDropSpreadOutliers:
         ts = pd.date_range("2022-01-03 10:00:00", periods=n, freq="1min", tz="UTC")
         spreads = [50] * n
         spreads[99] = 9000  # extreme spike -- well above p99
-        df = pd.DataFrame({
-            "ts": ts,
-            "open": [1800.0] * n,
-            "high": [1801.0] * n,
-            "low": [1799.0] * n,
-            "close": [1800.5] * n,
-            "tick_volume": np.ones(n, dtype="int64") * 100,
-            "real_volume": np.zeros(n, dtype="int64"),
-            "spread_points": pd.array(spreads, dtype="int32"),
-            "spread_pips": pd.array([s / 10.0 for s in spreads], dtype="float32"),
-        })
+        df = pd.DataFrame(
+            {
+                "ts": ts,
+                "open": [1800.0] * n,
+                "high": [1801.0] * n,
+                "low": [1799.0] * n,
+                "close": [1800.5] * n,
+                "tick_volume": np.ones(n, dtype="int64") * 100,
+                "real_volume": np.zeros(n, dtype="int64"),
+                "spread_points": pd.array(spreads, dtype="int32"),
+                "spread_pips": pd.array([s / 10.0 for s in spreads], dtype="float32"),
+            }
+        )
         result, dropped = drop_spread_outliers(df)
         assert dropped >= 1
 
@@ -180,20 +194,22 @@ class TestDropSpreadOutliers:
         ts_2022 = pd.date_range("2022-06-01 10:00:00", periods=100, freq="1min", tz="UTC")
         ts_2023 = pd.date_range("2023-06-01 10:00:00", periods=100, freq="1min", tz="UTC")
         spreads_2022 = [50] * 100
-        spreads_2023 = [500] * 100   # 2023 has uniformly high spread, p99=500 -> none dropped
+        spreads_2023 = [500] * 100  # 2023 has uniformly high spread, p99=500 -> none dropped
         ts_all = ts_2022.append(ts_2023)
         spreads_all = spreads_2022 + spreads_2023
-        df = pd.DataFrame({
-            "ts": ts_all,
-            "open": [1800.0] * 200,
-            "high": [1801.0] * 200,
-            "low": [1799.0] * 200,
-            "close": [1800.5] * 200,
-            "tick_volume": np.ones(200, dtype="int64") * 100,
-            "real_volume": np.zeros(200, dtype="int64"),
-            "spread_points": pd.array(spreads_all, dtype="int32"),
-            "spread_pips": pd.array([s / 10.0 for s in spreads_all], dtype="float32"),
-        })
+        df = pd.DataFrame(
+            {
+                "ts": ts_all,
+                "open": [1800.0] * 200,
+                "high": [1801.0] * 200,
+                "low": [1799.0] * 200,
+                "close": [1800.5] * 200,
+                "tick_volume": np.ones(200, dtype="int64") * 100,
+                "real_volume": np.zeros(200, dtype="int64"),
+                "spread_points": pd.array(spreads_all, dtype="int32"),
+                "spread_pips": pd.array([s / 10.0 for s in spreads_all], dtype="float32"),
+            }
+        )
         result, dropped = drop_spread_outliers(df)
         # 2022 has uniform spreads (no outlier), 2023 uniform (no outlier)
         assert dropped == 0
@@ -202,6 +218,7 @@ class TestDropSpreadOutliers:
 # ---------------------------------------------------------------------------
 # drop_return_explosions
 # ---------------------------------------------------------------------------
+
 
 class TestDropReturnExplosions:
     def test_drops_flash_crash_bars(self):
@@ -212,22 +229,24 @@ class TestDropReturnExplosions:
         spreads = [50] * n
         # Inject crash bars at index 100, 101, 102
         closes[100] = 1800.0
-        closes[101] = 1750.0   # -2.78% return
-        closes[102] = 1800.0   # recovery
+        closes[101] = 1750.0  # -2.78% return
+        closes[102] = 1800.0  # recovery
         spreads[100] = 9000
         spreads[101] = 9000
         spreads[102] = 9000
-        df = pd.DataFrame({
-            "ts": ts,
-            "open": closes,
-            "high": [c + 1 for c in closes],
-            "low":  [c - 1 for c in closes],
-            "close": closes,
-            "tick_volume": np.ones(n, dtype="int64"),
-            "real_volume": np.zeros(n, dtype="int64"),
-            "spread_points": pd.array(spreads, dtype="int32"),
-            "spread_pips": pd.array([s / 10.0 for s in spreads], dtype="float32"),
-        })
+        df = pd.DataFrame(
+            {
+                "ts": ts,
+                "open": closes,
+                "high": [c + 1 for c in closes],
+                "low": [c - 1 for c in closes],
+                "close": closes,
+                "tick_volume": np.ones(n, dtype="int64"),
+                "real_volume": np.zeros(n, dtype="int64"),
+                "spread_points": pd.array(spreads, dtype="int32"),
+                "spread_pips": pd.array([s / 10.0 for s in spreads], dtype="float32"),
+            }
+        )
         result, dropped = drop_return_explosions(df)
         assert dropped >= 1, "At least one flash-crash bar should be dropped"
 
@@ -237,17 +256,19 @@ class TestDropReturnExplosions:
         ts = pd.date_range("2022-01-03 10:00:00", periods=n, freq="1min", tz="UTC")
         rng = np.random.default_rng(42)
         closes = 1800.0 + np.cumsum(rng.normal(0, 0.1, n))
-        df = pd.DataFrame({
-            "ts": ts,
-            "open": closes,
-            "high": closes + 0.5,
-            "low": closes - 0.5,
-            "close": closes,
-            "tick_volume": np.ones(n, dtype="int64"),
-            "real_volume": np.zeros(n, dtype="int64"),
-            "spread_points": pd.array([50] * n, dtype="int32"),
-            "spread_pips": pd.array([5.0] * n, dtype="float32"),
-        })
+        df = pd.DataFrame(
+            {
+                "ts": ts,
+                "open": closes,
+                "high": closes + 0.5,
+                "low": closes - 0.5,
+                "close": closes,
+                "tick_volume": np.ones(n, dtype="int64"),
+                "real_volume": np.zeros(n, dtype="int64"),
+                "spread_points": pd.array([50] * n, dtype="int32"),
+                "spread_pips": pd.array([5.0] * n, dtype="float32"),
+            }
+        )
         _, dropped = drop_return_explosions(df)
         assert dropped == 0
 
@@ -259,18 +280,20 @@ class TestDropReturnExplosions:
         spreads = [50] * n
         # Large return at index 150 but normal spread
         closes[150] = 1750.0
-        spreads[150] = 50   # normal spread
-        df = pd.DataFrame({
-            "ts": ts,
-            "open": closes,
-            "high": [c + 1 for c in closes],
-            "low":  [c - 1 for c in closes],
-            "close": closes,
-            "tick_volume": np.ones(n, dtype="int64"),
-            "real_volume": np.zeros(n, dtype="int64"),
-            "spread_points": pd.array(spreads, dtype="int32"),
-            "spread_pips": pd.array([s / 10.0 for s in spreads], dtype="float32"),
-        })
+        spreads[150] = 50  # normal spread
+        df = pd.DataFrame(
+            {
+                "ts": ts,
+                "open": closes,
+                "high": [c + 1 for c in closes],
+                "low": [c - 1 for c in closes],
+                "close": closes,
+                "tick_volume": np.ones(n, dtype="int64"),
+                "real_volume": np.zeros(n, dtype="int64"),
+                "spread_points": pd.array(spreads, dtype="int32"),
+                "spread_pips": pd.array([s / 10.0 for s in spreads], dtype="float32"),
+            }
+        )
         result, dropped = drop_return_explosions(df)
         # The bar with large return + normal spread must survive
         assert 150 in result.index or len(result) > n - 5
@@ -279,6 +302,7 @@ class TestDropReturnExplosions:
 # ---------------------------------------------------------------------------
 # trim_to_window
 # ---------------------------------------------------------------------------
+
 
 class TestTrimToWindow:
     def test_clean_5y_bounds(self):
@@ -300,10 +324,10 @@ class TestTrimToWindow:
 
     def test_extended_bounds(self):
         ts_list = [
-            "2019-12-31 23:59:00",        # before
-            "2020-01-01 00:00:00",        # start
-            "2026-05-08 23:59:00",        # end (inclusive)
-            "2026-05-09 00:00:00",        # after
+            "2019-12-31 23:59:00",  # before
+            "2020-01-01 00:00:00",  # start
+            "2026-05-08 23:59:00",  # end (inclusive)
+            "2026-05-09 00:00:00",  # after
         ]
         rows = [{"ts": t} for t in ts_list]
         df = _make_df(rows)
@@ -321,6 +345,7 @@ class TestTrimToWindow:
 # clean (full pipeline)
 # ---------------------------------------------------------------------------
 
+
 class TestClean:
     def test_returns_tuple(self):
         df = _make_clean_df(20, start="2022-01-03 10:00:00")
@@ -332,7 +357,13 @@ class TestClean:
     def test_counts_keys(self):
         df = _make_clean_df(10, start="2022-01-03 10:00:00")
         _, counts = clean(df, scope="clean_5y")
-        expected_keys = {"dup_ts", "ohlc_invalid", "spread_outlier", "return_explosion", "out_of_window"}
+        expected_keys = {
+            "dup_ts",
+            "ohlc_invalid",
+            "spread_outlier",
+            "return_explosion",
+            "out_of_window",
+        }
         assert set(counts.keys()) == expected_keys
 
     def test_result_is_sorted(self):
@@ -354,22 +385,24 @@ class TestClean:
         spreads = np.full(n, 50, dtype="int32")
         # Inject flash crash bars at 300, 301, 302
         closes[300] = 1800.0
-        closes[301] = 1750.0   # -2.78% drop
-        closes[302] = 1800.0   # recovery
+        closes[301] = 1750.0  # -2.78% drop
+        closes[302] = 1800.0  # recovery
         spreads[300] = 9000
         spreads[301] = 9000
         spreads[302] = 9000
-        df = pd.DataFrame({
-            "ts": ts,
-            "open": closes,
-            "high": closes + 0.5,
-            "low": closes - 0.5,
-            "close": closes,
-            "tick_volume": np.ones(n, dtype="int64"),
-            "real_volume": np.zeros(n, dtype="int64"),
-            "spread_points": spreads,
-            "spread_pips": (spreads / 10.0).astype("float32"),
-        })
+        df = pd.DataFrame(
+            {
+                "ts": ts,
+                "open": closes,
+                "high": closes + 0.5,
+                "low": closes - 0.5,
+                "close": closes,
+                "tick_volume": np.ones(n, dtype="int64"),
+                "real_volume": np.zeros(n, dtype="int64"),
+                "spread_points": spreads,
+                "spread_pips": (spreads / 10.0).astype("float32"),
+            }
+        )
         result, counts = clean(df, scope="clean_5y")
         total_dropped = sum(counts.values())
         # At minimum the crash bars were dropped somewhere in the pipeline

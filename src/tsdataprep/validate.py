@@ -15,8 +15,17 @@ import pandas as pd
 SPREAD_PIPS_MEDIAN_MIN = 1.5
 SPREAD_PIPS_MEDIAN_MAX = 3.0
 
-REQUIRED_COLUMNS = ["ts", "open", "high", "low", "close",
-                    "tick_volume", "real_volume", "spread_points", "spread_pips"]
+REQUIRED_COLUMNS = [
+    "ts",
+    "open",
+    "high",
+    "low",
+    "close",
+    "tick_volume",
+    "real_volume",
+    "spread_points",
+    "spread_pips",
+]
 
 
 def _assert_columns(df: pd.DataFrame) -> None:
@@ -45,8 +54,10 @@ def _assert_ohlc_consistency(df: pd.DataFrame) -> None:
     """Raise ValueError if any bar violates high>=low or OHLC bounds."""
     bad = (
         (df["high"] < df["low"])
-        | (df["open"] < df["low"]) | (df["open"] > df["high"])
-        | (df["close"] < df["low"]) | (df["close"] > df["high"])
+        | (df["open"] < df["low"])
+        | (df["open"] > df["high"])
+        | (df["close"] < df["low"])
+        | (df["close"] > df["high"])
     )
     n_bad = int(bad.sum())
     if n_bad > 0:
