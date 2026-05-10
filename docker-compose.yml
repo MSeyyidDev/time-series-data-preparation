@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+  etl:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: tsdataprep:latest
+    container_name: tsdataprep-etl
+    # Mount the local data directory into the container.
+    # Place your raw MT5 export at ./data/raw/XAUUSD_M1.csv before running.
+    volumes:
+      - ./data:/app/data
+      - ./reports:/app/reports
+    environment:
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - TSDATAPREP_SCOPE=${TSDATAPREP_SCOPE:-both}
+    command:
+      - tsdataprep
+      - run-all
+      - --input
+      - data/raw/XAUUSD_M1.csv
+      - --out
+      - data/processed
+    # The container exits when the pipeline finishes — no restart needed.
+    restart: "no"
