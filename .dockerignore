@@ -1,0 +1,57 @@
+# Version control
+.git
+.gitignore
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyd
+*.so
+.eggs/
+
+# Virtual environments
+.venv/
+env/
+venv/
+
+# Testing (not needed in image)
+tests/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Linting / type cache
+.ruff_cache/
+.mypy_cache/
+
+# IDEs
+.idea/
+.vscode/
+
+# Distribution
+build/
+dist/
+*.egg-info/
+
+# Data (mounted at runtime, not baked in)
+data/raw/*
+data/interim/*
+data/processed/*
+
+# Notebooks
+notebooks/
+
+# Reports (generated at runtime)
+reports/
+
+# Documentation (not needed in image)
+docs/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# OS artefacts
+.DS_Store
+Thumbs.db
