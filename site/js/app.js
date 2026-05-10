@@ -158,23 +158,31 @@ async function renderMonthlyOHLC() {
 
 // ── SQL panel ─────────────────────────────────────────────────────────────────
 
-// Year 2000 .. year 2100 in milliseconds since epoch -- heuristic to detect that
-// a bigint is actually a timestamp (DuckDB-WASM returns TIMESTAMP columns as
-// millisecond bigints, not Date objects).
-const TS_MIN = 946684800000n;
-const TS_MAX = 4102444800000n;
+// Year 2000 .. year 2100 in milliseconds since epoch -- heuristic to render
+// timestamp values returned by DuckDB-WASM as ISO strings. The JS bindings
+// return TIMESTAMP columns as numbers (or bigints if they exceed safe int);
+// neither type is intrinsically distinguishable from a normal integer, so we
+// fall back to a value-range check. 1291 (the bar count) is below TS_MIN so
+// stays a number; 1577923200000 (a 2020-01 epoch ms) gets formatted.
+const TS_MIN = 946684800000;       // 2000-01-01 UTC
+const TS_MAX = 4102444800000;      // 2100-01-01 UTC
+const isLikelyEpochMs = (n) => n >= TS_MIN && n <= TS_MAX;
+
+function fmtTs(numericMs) {
+  return new Date(numericMs).toISOString().replace('T', ' ').replace('.000Z', '');
+}
 
 function fmt(value) {
   if (value === null || value === undefined) return '<span class="muted">null</span>';
+  if (value instanceof Date) return value.toISOString().replace('T', ' ').replace('.000Z', '');
   if (typeof value === 'bigint') {
-    if (value >= TS_MIN && value <= TS_MAX) {
-      return new Date(Number(value)).toISOString().replace('T', ' ').replace('.000Z', '');
-    }
+    const asNum = Number(value);
+    if (Number.isSafeInteger(asNum) && isLikelyEpochMs(asNum)) return fmtTs(asNum);
     return value.toString();
   }
-  if (value instanceof Date) return value.toISOString().replace('T', ' ').replace('.000Z', '');
   if (typeof value === 'number') {
     if (!Number.isFinite(value)) return String(value);
+    if (Number.isInteger(value) && isLikelyEpochMs(value)) return fmtTs(value);
     return Number.isInteger(value) ? value.toString() : value.toFixed(4);
   }
   return String(value);
