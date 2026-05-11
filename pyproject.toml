@@ -48,9 +48,9 @@ dev = [
 tsdataprep = "tsdataprep.cli:app"
 
 [project.urls]
-Homepage = "https://github.com/seyyidsahin2834/time-series-data-preparation"
-Repository = "https://github.com/seyyidsahin2834/time-series-data-preparation"
-Issues = "https://github.com/seyyidsahin2834/time-series-data-preparation/issues"
+Homepage = "https://github.com/MSeyyidDev/time-series-data-preparation"
+Repository = "https://github.com/MSeyyidDev/time-series-data-preparation"
+Issues = "https://github.com/MSeyyidDev/time-series-data-preparation/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -90,3 +90,4 @@ pretty = true
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "--tb=short -q"
+

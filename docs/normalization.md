@@ -134,7 +134,7 @@ The figures below show the spread distribution before and after cleaning.
 - p99 spread: substantially reduced
 - Tail is capped at per-year p99
 
-![Spread distribution before and after cleaning](../reports/figures/spread_before_after.png)
+![Spread distribution before and after cleaning](../site/figures/spread_before_after.png)
 
 *Figure: Histogram of spread_pips before cleaning (grey) and after cleaning (blue).
 The long right tail — dominated by rollover and flash-crash bars — is removed.*
@@ -145,7 +145,7 @@ The long right tail — dominated by rollover and flash-crash bars — is remove
 
 The August 9, 2021 event is the most dramatic quality issue in the dataset.
 
-![Flash crash zoom](../reports/figures/flash_crash_2021_08_09.png)
+![Flash crash zoom](../site/figures/flash_crash_2021_08_09.png)
 
 *Figure: XAUUSD M1 close price and spread_points around 2021-08-09 01:00–04:00 UTC+2.
 The two flagged bars show spread_points > 9,000 and ret_1m near -2.7%.*

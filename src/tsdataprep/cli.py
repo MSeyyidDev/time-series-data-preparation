@@ -65,13 +65,12 @@ def cmd_inspect(
         console.print(f"[red]File not found: {input}[/red]")
         raise typer.Exit(1)
 
-    # Try to import from Agent 1's module if available, else fallback
+    # Prefer the package parser, with a small CSV fallback for smoke tests.
     try:
-        from tsdataprep.io import read_raw_csv  # Agent 1
+        from tsdataprep.io import read_raw_csv
 
         df = read_raw_csv(input)
     except ImportError:
-        # Agent 1 not yet written; do basic inspection ourselves
         df = pd.read_csv(
             input,
             sep="\t",
@@ -110,7 +109,6 @@ def cmd_clean(
     out.mkdir(parents=True, exist_ok=True)
 
     try:
-        # Try to import Agent 1's clean script logic
         import importlib.util
 
         project_root = Path(__file__).resolve().parent.parent.parent.parent
@@ -122,14 +120,13 @@ def cmd_clean(
             if hasattr(mod, "main"):
                 mod.main(input_path=input, out_dir=out, scopes=scopes)
                 return
-        # Fallback: call Agent 1 module if importable
-        from tsdataprep.clean import clean_pipeline  # Agent 1  # type: ignore[import]
+        from tsdataprep.clean import clean_pipeline  # type: ignore[import]
 
         for s in scopes:
             clean_pipeline(input, out, scope=s)
     except (ImportError, ModuleNotFoundError) as exc:
         console.print(
-            "[yellow]Agent 1 clean module not available. Run scripts/02_clean.py directly.[/yellow]"
+            "[yellow]Clean module not available. Run scripts/02_clean.py directly.[/yellow]"
         )
         raise typer.Exit(1) from exc
 
@@ -245,22 +242,30 @@ def cmd_run_all(
     interim_dir.mkdir(parents=True, exist_ok=True)
 
     console.rule("[bold]Step 1/4 -- Clean[/bold]")
-    # Try to run Agent 1's clean script
     project_root = Path(__file__).resolve().parent.parent.parent.parent
     clean_script = project_root / "scripts" / "02_clean.py"
     if clean_script.exists():
         import subprocess
 
         result = subprocess.run(
-            [sys.executable, str(clean_script), "--input", str(input), "--out", str(interim_dir)],
+            [
+                sys.executable,
+                str(clean_script),
+                "--input",
+                str(input),
+                "--out-interim",
+                str(interim_dir),
+                "--out-processed",
+                str(out),
+            ],
             capture_output=False,
         )
         if result.returncode != 0:
-            console.print("[yellow]Clean script exited with non-zero code. Continuing...[/yellow]")
+            console.print("[red]Clean script exited with non-zero code.[/red]")
+            raise typer.Exit(result.returncode)
     else:
         console.print(
-            "[yellow]scripts/02_clean.py not found (Agent 1 not done yet). "
-            "Expecting pre-built interim Parquet.[/yellow]"
+            "[yellow]scripts/02_clean.py not found. Expecting pre-built interim Parquet.[/yellow]"
         )
 
     console.rule("[bold]Step 2/4 -- Resample[/bold]")

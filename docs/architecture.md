@@ -3,7 +3,7 @@
 ## Pipeline overview
 
 The pipeline is a linear, deterministic ETL that runs entirely in-process.
-No streaming, no distributed compute — the 132 MB source file fits in RAM.
+No streaming, no distributed compute â€” the 132 MB source file fits in RAM.
 
 ```
 Raw MT5 export (tab-separated CSV)
@@ -11,15 +11,15 @@ Raw MT5 export (tab-separated CSV)
           v
   +-----------------+
   |   io.py         |  parse_raw()
-  |  (Agent 1)      |  - reads tab-separated CSV
-  |                 |  - parses <DATE>+<TIME> → UTC timestamp
+  |      |  - reads tab-separated CSV
+  |                 |  - parses <DATE>+<TIME> â†’ UTC timestamp
   |                 |  - renames columns to canonical schema
   +-----------------+
           |
           v
   +-----------------+
   |   clean.py      |  clean_m1()
-  |  (Agent 1)      |  - OHLC sanity check (high>=low, open/close in range)
+  |      |  - OHLC sanity check (high>=low, open/close in range)
   |                 |  - spread outlier filter (per-year p99)
   |                 |  - return explosion filter (MAD-based)
   |                 |  - logs every dropped row to quality_report.json
@@ -28,14 +28,14 @@ Raw MT5 export (tab-separated CSV)
           v
   +-----------------+
   |  normalize.py   |  normalize()
-  |  (Agent 1)      |  - adds spread_pips = spread_points / 10
+  |      |  - adds spread_pips = spread_points / 10
   |                 |  - validates median spread in [1.5, 3.0] pips
   +-----------------+
           |
           v
   +-----------------+
   |  validate.py    |  validate()
-  |  (Agent 1)      |  - schema conformance check
+  |      |  - schema conformance check
   |                 |  - monotonic timestamp check
   |                 |  - emits warnings for any violation
   +-----------------+
@@ -43,7 +43,7 @@ Raw MT5 export (tab-separated CSV)
           v  (clean M1 DataFrame, two scopes: clean_5y / extended)
   +-----------------+
   |  resample.py    |  resample_all()
-  |  (Agent 2)      |  - produces M5, M15, H1, H4, H12, D1, W1, MN1
+  |      |  - produces M5, M15, H1, H4, H12, D1, W1, MN1
   |                 |  - aggregation: first/max/min/last/sum/mean
   |                 |  - label="left", closed="left"
   +-----------------+
@@ -51,7 +51,7 @@ Raw MT5 export (tab-separated CSV)
           v
   +-----------------+
   |  resample.py    |  write_parquet() + write_duckdb()
-  |  (Agent 2)      |  - Hive-partitioned Parquet (year=YYYY)
+  |      |  - Hive-partitioned Parquet (year=YYYY)
   |                 |  - Single DuckDB file, one table per timeframe
   |                 |  - compression=zstd, level=3 (deterministic)
   +-----------------+
@@ -59,7 +59,7 @@ Raw MT5 export (tab-separated CSV)
           v
   +-----------------+
   | visualize.py    |  generate_figures()
-  |  (Agent 2)      |  - price_overview.png (full OHLC)
+  |      |  - price_overview.png (full OHLC)
   |                 |  - spread_before_after.png
   |                 |  - flash_crash_2021_08_09.png
   |                 |  - Optional: interactive HTML report
@@ -74,31 +74,31 @@ Raw MT5 export (tab-separated CSV)
 ```
 src/tsdataprep/
   __init__.py       package init, exports VERSION
-  cli.py            Typer CLI — six subcommands (Agent 2)
-  config.py         constants, paths, scope definitions (Agent 2)
-  io.py             parse_raw(), load_parquet() (Agent 1)
-  clean.py          clean_m1(), drop_* helpers (Agent 1)
-  normalize.py      normalize(), validate_spread_median() (Agent 1)
-  validate.py       validate_schema(), validate_monotonic() (Agent 1)
-  resample.py       resample_all(), write_parquet(), write_duckdb() (Agent 2)
-  visualize.py      generate_figures(), flash_crash_zoom() (Agent 2)
+  cli.py            Typer CLI â€” six subcommands
+  config.py         constants, paths, scope definitions
+  io.py             parse_raw(), load_parquet()
+  clean.py          clean_m1(), drop_* helpers
+  normalize.py      normalize(), validate_spread_median()
+  validate.py       validate_schema(), validate_monotonic()
+  resample.py       resample_all(), write_parquet(), write_duckdb()
+  visualize.py      generate_figures(), flash_crash_zoom()
 
 scripts/
-  01_inspect.py     standalone quick-stats (Agent 1)
-  02_clean.py       standalone clean step (Agent 1)
-  03_resample.py    standalone resample step (Agent 2)
-  04_visualize.py   standalone visualize step (Agent 2)
+  01_inspect.py     standalone quick-stats
+  02_clean.py       standalone clean step
+  03_resample.py    standalone resample step
+  04_visualize.py   standalone visualize step
 
 tests/
-  conftest.py       shared fixtures: synthetic_m1_df, tmp_data_dir (Agent 3)
-  test_io.py        (Agent 1)
-  test_clean.py     (Agent 1)
-  test_normalize.py (Agent 1)
-  test_validate.py  (Agent 1)
-  test_resample.py  (Agent 2)
-  test_visualize.py (Agent 2)
+  conftest.py       shared fixtures: synthetic_m1_df, tmp_data_dir
+  test_io.py
+  test_clean.py
+  test_normalize.py
+  test_validate.py
+  test_resample.py
+  test_visualize.py
   fixtures/
-    sample_m1.csv   1 000-row synthetic MT5 data (Agent 3)
+    sample_m1.csv   1 000-row synthetic MT5 data
 ```
 
 ## Data flow details
@@ -106,7 +106,7 @@ tests/
 ### Timestamp handling
 
 Raw MT5 data uses broker time (EET / UTC+2 with DST).
-`io.parse_raw()` converts to UTC by subtracting 2 hours (no DST table lookup —
+`io.parse_raw()` converts to UTC by subtracting 2 hours (no DST table lookup â€”
 this is a known simplification; the broker's DST schedule matches Central
 European Time).
 
@@ -130,17 +130,18 @@ reproduced exactly from the same input.
 
 ```
 cli.py
-  └── config.py
-  └── io.py
-        └── (pandas, pyarrow)
-  └── clean.py
-        └── io.py, (numpy)
-  └── normalize.py
-        └── clean.py
-  └── validate.py
-        └── normalize.py
-  └── resample.py
-        └── validate.py, (duckdb, pyarrow)
-  └── visualize.py
-        └── resample.py, (matplotlib, plotly)
+  â””â”€â”€ config.py
+  â””â”€â”€ io.py
+        â””â”€â”€ (pandas, pyarrow)
+  â””â”€â”€ clean.py
+        â””â”€â”€ io.py, (numpy)
+  â””â”€â”€ normalize.py
+        â””â”€â”€ clean.py
+  â””â”€â”€ validate.py
+        â””â”€â”€ normalize.py
+  â””â”€â”€ resample.py
+        â””â”€â”€ validate.py, (duckdb, pyarrow)
+  â””â”€â”€ visualize.py
+        â””â”€â”€ resample.py, (matplotlib, plotly)
 ```
+

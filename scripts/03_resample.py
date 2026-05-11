@@ -63,7 +63,7 @@ def main(interim_dir: Path | None = None, out_dir: Path | None = None) -> dict:
         cfg.parquet_dir = out_dir / "parquet"
         cfg.duckdb_file = out_dir / "xauusd.duckdb"
 
-    # Wait up to 3 min for Agent 1's output
+    # Wait up to 3 min for the clean step output.
     available = [s for s in ALL_SCOPES if cfg.interim_parquet(s).exists()]
     if not available:
         logger.warning("No interim Parquet found; waiting up to 3 minutes...")

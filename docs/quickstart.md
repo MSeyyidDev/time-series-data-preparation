@@ -1,13 +1,13 @@
-# Quickstart — from clone to figures in 5 steps
+# Quickstart â€” from clone to figures in 5 steps
 
 **Prerequisites:** Python 3.11+, pip, Git. (Optional: Docker)
 
 ---
 
-## Step 1 — Clone and install
+## Step 1 â€” Clone and install
 
 ```bash
-git clone https://github.com/seyyidsahin2834/time-series-data-preparation.git
+git clone https://github.com/MSeyyidDev/time-series-data-preparation.git
 cd time-series-data-preparation
 python -m venv .venv
 source .venv/bin/activate          # Windows: .venv\Scripts\Activate.ps1
@@ -16,7 +16,7 @@ pip install -e ".[dev]"
 
 ---
 
-## Step 2 — Place your raw data file
+## Step 2 â€” Place your raw data file
 
 Copy your MT5 export to the expected location:
 
@@ -35,7 +35,7 @@ If you want to run a quick smoke-test without real data first, skip to Step 5
 
 ---
 
-## Step 3 — Inspect the raw data
+## Step 3 â€” Inspect the raw data
 
 ```bash
 tsdataprep inspect --input data/raw/XAUUSD_M1.csv
@@ -46,7 +46,7 @@ data quality issues. No files are written.
 
 ---
 
-## Step 4 — Run the full pipeline
+## Step 4 â€” Run the full pipeline
 
 ```bash
 tsdataprep run-all \
@@ -54,7 +54,7 @@ tsdataprep run-all \
     --out data/processed
 ```
 
-This runs all six stages (inspect → clean → normalize → resample → export →
+This runs all six stages (inspect â†’ clean â†’ normalize â†’ resample â†’ export â†’
 visualize) and writes:
 
 ```
@@ -72,12 +72,12 @@ reports/figures/
   report.html              (interactive Plotly report)
 ```
 
-Expected runtime on a modern laptop: **3–8 minutes** for the full 2.2 M-row
+Expected runtime on a modern laptop: **3â€“8 minutes** for the full 2.2 M-row
 dataset.
 
 ---
 
-## Step 5 — Verify with the test suite
+## Step 5 â€” Verify with the test suite
 
 ```bash
 pytest -q
@@ -149,3 +149,4 @@ Or from the command line:
 duckdb data/processed/xauusd.duckdb \
     "SELECT COUNT(*), MIN(ts), MAX(ts) FROM xauusd_h1"
 ```
+

@@ -8,7 +8,7 @@ Thank you for your interest in contributing to Time Series Data Preparation.
 
 ```bash
 # 1. Fork and clone
-git clone https://github.com/seyyidsahin2834/time-series-data-preparation.git
+git clone https://github.com/MSeyyidDev/time-series-data-preparation.git
 cd time-series-data-preparation
 
 # 2. Create a virtual environment
@@ -49,7 +49,7 @@ ruff check --fix src tests scripts
 ruff format src tests scripts
 ```
 
-Line length is 100 characters. Follow existing module structure — one concern per module.
+Line length is 100 characters. Follow existing module structure â€” one concern per module.
 
 ## Type annotations
 
@@ -79,8 +79,9 @@ chore(deps): bump pyarrow to 16.0
 
 ## What not to change
 
-- `SHARED_SPEC.md` — frozen specification document.
+- `SHARED_SPEC.md` â€” frozen specification document.
 - The canonical column schema defined in spec section 3.1.
 - The CLI subcommand names defined in spec section 7.
 
 If you believe the spec needs updating, open an issue first for discussion.
+

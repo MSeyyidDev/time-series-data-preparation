@@ -1,7 +1,6 @@
 """
 Shared pytest fixtures for the Time Series Data Preparation test suite.
 
-All fixtures in this file are owned by Agent 3 (DevOps/Docs).
 Do NOT add test functions here -- only fixtures used across multiple test modules.
 """
 

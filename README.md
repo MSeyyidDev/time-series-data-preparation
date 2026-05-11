@@ -2,7 +2,9 @@
 
 Production-grade time-series data preparation for XAUUSD: from messy MT5 export to clean Parquet/DuckDB at 9 timeframes.
 
-[![CI](https://github.com/seyyidsahin2834/time-series-data-preparation/actions/workflows/ci.yml/badge.svg)](https://github.com/seyyidsahin2834/time-series-data-preparation/actions/workflows/ci.yml)
+[Live demo site](https://mseyyiddev.github.io/time-series-data-preparation/) - static GitHub Pages dashboard with the cleaned sample, diagnostic figures and downloadable Parquet outputs.
+
+[![CI](https://github.com/MSeyyidDev/time-series-data-preparation/actions/workflows/ci.yml/badge.svg)](https://github.com/MSeyyidDev/time-series-data-preparation/actions/workflows/ci.yml)
 [![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/downloads/release/python-3110/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Code style: ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
@@ -19,8 +21,8 @@ quantitative analysis can happen, this mess needs to be cleaned, normalized, and
 reshaped into a reliable format.
 
 This project delivers that foundation. It takes the raw XAUUSD M1 CSV (2.2 million
-rows, 2020–2026) and produces deterministic, schema-validated Parquet files and a
-DuckDB database at nine timeframes — the exact input a downstream quant analysis
+rows, 2020â€“2026) and produces deterministic, schema-validated Parquet files and a
+DuckDB database at nine timeframes â€” the exact input a downstream quant analysis
 project needs.
 
 ---
@@ -28,7 +30,7 @@ project needs.
 ## Quick start
 
 ```bash
-git clone https://github.com/seyyidsahin2834/time-series-data-preparation.git
+git clone https://github.com/MSeyyidDev/time-series-data-preparation.git
 cd time-series-data-preparation
 pip install -e ".[dev]"
 tsdataprep run-all --input data/raw/XAUUSD_M1.csv --out data/processed
@@ -44,26 +46,27 @@ including Docker usage and DuckDB query examples.
 
 The pipeline is a linear ETL that runs on the raw M1 bars before resampling.
 
-**Cleaning rules applied to M1 (spec §4):**
+**Cleaning rules applied to M1 (spec Â§4):**
 
-- **Parse and deduplicate** — merges `<DATE>` and `<TIME>` into a single UTC
+- **Parse and deduplicate** â€” merges `<DATE>` and `<TIME>` into a single UTC
   timestamp, drops exact duplicate rows.
-- **OHLC sanity check** — drops bars where `high < low` or open/close fall
+- **OHLC sanity check** â€” drops bars where `high < low` or open/close fall
   outside `[low, high]` or any price is zero or negative.
-- **Spread outlier filter** — computes the per-year 99th percentile of
+- **Spread outlier filter** â€” computes the per-year 99th percentile of
   `spread_points` and drops any bar exceeding it. Rollover and news bars with
   extreme spreads are not tradeable and would distort statistics.
-- **Return-explosion filter** — drops bars where `|ret_1m| > 8 * MAD` AND
+- **Return-explosion filter** â€” drops bars where `|ret_1m| > 8 * MAD` AND
   `spread_points > per-year p95`. The dual condition preserves genuine fast
   moves (e.g. NFP) while removing corrupted data. This rule catches the
   **August 9, 2021 gold flash crash** (bars at ~01:57 UTC+2 with
-  `spread_points ≈ 9,000` and `ret_1m ≈ -2.7%`) — the most dramatic data
+  `spread_points â‰ˆ 9,000` and `ret_1m â‰ˆ -2.7%`) â€” the most dramatic data
   quality event in the dataset.
-- **Date window trim** — produces two scopes: `clean_5y` (2020–2024 complete
-  years) and `extended` (2020–2026-05-08).
-- **Spread normalization** — adds `spread_pips = spread_points / 10` (gold
-  CFD convention: 1 pip = $0.10). The pipeline validates that median
-  `spread_pips` falls in `[1.5, 3.0]` after cleaning.
+- **Date window trim** â€” produces two scopes: `clean_5y` (2020â€“2024 complete
+  years) and `extended` (2020â€“2026-05-08).
+- **Spread normalization** â€” adds `spread_pips = spread_points / 10` (gold
+  CFD convention: 1 pip = $0.10). The pipeline records median and mean spread
+  in the quality report and emits warnings when broker-specific values fall
+  outside the expected validation band.
 
 Every dropped row is logged with a reason code to `data/processed/quality_report.json`.
 A `manifest.json` records input sha256, row counts, parameters, and package
@@ -79,7 +82,7 @@ versions for full reproducibility.
 
 ## Output schema
 
-The canonical schema applied to every output file (spec §3.1):
+The canonical schema applied to every output file (spec Â§3.1):
 
 | Column         | dtype                  | Notes                                        |
 |----------------|------------------------|----------------------------------------------|
@@ -171,11 +174,11 @@ time-series-data-preparation/
     timeframes.md
     quickstart.md
   data/
-    raw/        (place XAUUSD_M1.csv here — not committed)
-    interim/    (intermediate artefacts — not committed)
-    processed/  (pipeline output — not committed)
+    raw/        (place XAUUSD_M1.csv here â€” not committed)
+    interim/    (intermediate artefacts â€” not committed)
+    processed/  (pipeline output â€” not committed)
   reports/
-    figures/    (PNG/HTML plots — not committed)
+    figures/    (PNG/HTML plots â€” not committed)
   Dockerfile
   docker-compose.yml
   pyproject.toml
@@ -209,20 +212,20 @@ docker run --rm -v $(pwd)/data:/app/data tsdataprep:latest \
 
 The pipeline generates three diagnostic figures:
 
-**Price overview — full XAUUSD M1 close price 2020–2026:**
+**Price overview â€” full XAUUSD M1 close price 2020â€“2026:**
 
-![Price overview](reports/figures/price_overview.png)
+![Rows per timeframe](site/figures/rows_per_timeframe.png)
 
 **Spread distribution before and after cleaning:**
 
-![Spread before and after](reports/figures/spread_before_after.png)
+![Spread before and after](site/figures/spread_before_after.png)
 
 *The long right tail (rollover and flash-crash bars) is removed by the
 spread-outlier and return-explosion filters.*
 
 **August 2021 flash crash zoom (2021-08-09):**
 
-![Flash crash 2021-08-09](reports/figures/flash_crash_2021_08_09.png)
+![Flash crash 2021-08-09](site/figures/flash_crash_2021_08_09.png)
 
 *The two bars at ~01:57 UTC+2 with spread_points > 9,000 are flagged and
 dropped. See [docs/normalization.md](docs/normalization.md) for full details.*
@@ -231,29 +234,29 @@ dropped. See [docs/normalization.md](docs/normalization.md) for full details.*
 
 ## Sources
 
-1. **MT5 historical data export format** — MetaQuotes MQL5 community forum,
+1. **MT5 historical data export format** â€” MetaQuotes MQL5 community forum,
    "How to export quotes from MetaTrader 5?":
    https://www.mql5.com/en/forum/227308
 
-2. **MT5 export walkthrough** — StrategyQuant documentation,
+2. **MT5 export walkthrough** â€” StrategyQuant documentation,
    "How to Export Data from Metatrader 5":
    https://strategyquant.com/doc/quantdatamanager/how-to-export-data-from-metatrader-5/
 
-3. **August 9, 2021 gold flash crash** — FX Empire,
+3. **August 9, 2021 gold flash crash** â€” FX Empire,
    "Gold Bounces Off $1,678; The Low of the August 2021 Flash Crash":
    https://www.fxempire.com/forecasts/article/gold-bounces-off-1678-the-low-of-the-august-2021-flash-crash-1072038
 
-4. **XAUUSD pip and point convention** — Ultima Markets Academy,
+4. **XAUUSD pip and point convention** â€” Ultima Markets Academy,
    "What is 1 Pip in XAUUSD? How to Calculate?":
    https://www.ultimamarkets.com/academy/what-is-1-pip-in-xauusd-how-to-calculate/
 
 5. **pandas resample and time series offset aliases**:
    https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html
 
-6. **Apache Parquet file format** — official documentation:
+6. **Apache Parquet file format** â€” official documentation:
    https://parquet.apache.org/docs/
 
-7. **DuckDB in-process OLAP database** — official documentation:
+7. **DuckDB in-process OLAP database** â€” official documentation:
    https://duckdb.org/docs/current/
 
 See [docs/data-sources.md](docs/data-sources.md) for extended sourcing notes,
@@ -263,12 +266,12 @@ column-level documentation, and the full flash crash case study.
 
 ## Roadmap / next steps
 
-- **Real quant analysis on this output** — the next project will consume
+- **Real quant analysis on this output** â€” the next project will consume
   `xauusd.duckdb` directly: trend filters, volatility regimes, and a simple
   mean-reversion backtest on D1 data.
-- **Live data refresh** — add an `update` subcommand that appends new MT5
+- **Live data refresh** â€” add an `update` subcommand that appends new MT5
   M1 bars to the existing Parquet partition without reprocessing historical data.
-- **Additional instruments** — the pipeline is parameterized for any MT5
+- **Additional instruments** â€” the pipeline is parameterized for any MT5
   OHLCV export; the next step is adding EURUSD and BTCUSD for cross-asset
   correlation analysis.
 
@@ -276,4 +279,5 @@ column-level documentation, and the full flash crash case study.
 
 ## License
 
-MIT License — Copyright (c) 2026 Seyyid Sahin. See [LICENSE](LICENSE).
+MIT License â€” Copyright (c) 2026 Seyyid Sahin. See [LICENSE](LICENSE).
+
