@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 # ---------------------------------------------------------------------------
-# Frozen constants (spec §3.3)
+# Frozen constants (spec section 3.3)
 # ---------------------------------------------------------------------------
 
 #: Aggregation spec used for all resample operations.
@@ -23,7 +23,7 @@ AGG_DICT: dict[str, str] = {
 }
 
 #: Mapping from short timeframe label -> pandas offset alias.
-FREQ_MAP: dict[str, str] = {
+FREQ_MAP: dict[str, str | None] = {
     "M1": None,  # pass-through, not resampled
     "M5": "5min",
     "M15": "15min",

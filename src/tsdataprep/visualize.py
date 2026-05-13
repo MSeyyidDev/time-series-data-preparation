@@ -282,7 +282,7 @@ def fig_gap_heatmap(parquet_dir: Path, out_path: Path) -> None:
     df["dow"] = df["ts"].dt.dayofweek  # 0=Mon, 6=Sun
     df["hour"] = df["ts"].dt.hour
 
-    # Expected minutes per cell ≈ (total weeks) * 60
+    # Expected minutes per cell is approximately (total weeks) * 60.
     total_weeks = (df["ts"].max() - df["ts"].min()).days / 7
     expected_per_cell = max(total_weeks * 60, 1)
 

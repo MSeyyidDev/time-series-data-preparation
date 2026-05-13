@@ -7,11 +7,12 @@ Assumption: the MT5 broker clock is UTC (or very close -- see docstring on
 from __future__ import annotations
 
 import warnings
+from typing import Any
 
 import pandas as pd
 
 # Canonical dtype map after normalization
-CANONICAL_DTYPES: dict[str, str] = {
+CANONICAL_DTYPES: dict[str, Any] = {
     "open": "float64",
     "high": "float64",
     "low": "float64",

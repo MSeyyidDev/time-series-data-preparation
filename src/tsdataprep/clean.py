@@ -1,4 +1,4 @@
-"""Clean normalized M1 XAUUSD data according to SHARED_SPEC §4.
+"""Clean normalized M1 XAUUSD data according to SHARED_SPEC section 4.
 
 All public functions accept and return DataFrames with the canonical schema.
 Every dropped row is counted; callers accumulate the counters in a dict with
@@ -80,7 +80,7 @@ def drop_return_explosions(df: pd.DataFrame) -> tuple[pd.DataFrame, int]:
     """Drop bars where |ret| > 8*MAD(ret) AND spread_points > global p95.
 
     MAD is scaled by 1.4826 to make it a robust sigma equivalent.
-    Both conditions must hold simultaneously (spec §4 rule 4).
+    Both conditions must hold simultaneously (spec section 4 rule 4).
     Returns (cleaned_df, n_dropped).
     """
     df = df.copy()

@@ -3,7 +3,7 @@
 ## Pipeline overview
 
 The pipeline is a linear, deterministic ETL that runs entirely in-process.
-No streaming, no distributed compute â€” the 132 MB source file fits in RAM.
+No streaming, no distributed compute - the 132 MB source file fits in RAM.
 
 ```
 Raw MT5 export (tab-separated CSV)
@@ -12,7 +12,7 @@ Raw MT5 export (tab-separated CSV)
   +-----------------+
   |   io.py         |  parse_raw()
   |      |  - reads tab-separated CSV
-  |                 |  - parses <DATE>+<TIME> â†’ UTC timestamp
+  |                 |  - parses <DATE>+<TIME> -> UTC timestamp
   |                 |  - renames columns to canonical schema
   +-----------------+
           |
@@ -74,7 +74,7 @@ Raw MT5 export (tab-separated CSV)
 ```
 src/tsdataprep/
   __init__.py       package init, exports VERSION
-  cli.py            Typer CLI â€” six subcommands
+  cli.py            Typer CLI - six subcommands
   config.py         constants, paths, scope definitions
   io.py             parse_raw(), load_parquet()
   clean.py          clean_m1(), drop_* helpers
@@ -106,7 +106,7 @@ tests/
 ### Timestamp handling
 
 Raw MT5 data uses broker time (EET / UTC+2 with DST).
-`io.parse_raw()` converts to UTC by subtracting 2 hours (no DST table lookup â€”
+`io.parse_raw()` converts to UTC by subtracting 2 hours (no DST table lookup -
 this is a known simplification; the broker's DST schedule matches Central
 European Time).
 
@@ -130,18 +130,18 @@ reproduced exactly from the same input.
 
 ```
 cli.py
-  â””â”€â”€ config.py
-  â””â”€â”€ io.py
-        â””â”€â”€ (pandas, pyarrow)
-  â””â”€â”€ clean.py
-        â””â”€â”€ io.py, (numpy)
-  â””â”€â”€ normalize.py
-        â””â”€â”€ clean.py
-  â””â”€â”€ validate.py
-        â””â”€â”€ normalize.py
-  â””â”€â”€ resample.py
-        â””â”€â”€ validate.py, (duckdb, pyarrow)
-  â””â”€â”€ visualize.py
-        â””â”€â”€ resample.py, (matplotlib, plotly)
+  +-- config.py
+  +-- io.py
+        +-- (pandas, pyarrow)
+  +-- clean.py
+        +-- io.py, (numpy)
+  +-- normalize.py
+        +-- clean.py
+  +-- validate.py
+        +-- normalize.py
+  +-- resample.py
+        +-- validate.py, (duckdb, pyarrow)
+  +-- visualize.py
+        +-- resample.py, (matplotlib, plotly)
 ```
 

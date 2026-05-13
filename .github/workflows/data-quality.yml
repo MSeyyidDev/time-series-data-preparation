@@ -16,10 +16,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python 3.11
+      - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.12"
           cache: "pip"
 
       - name: Install dependencies
@@ -31,6 +31,6 @@ jobs:
         run: |
           tsdataprep inspect --input ${{ github.event.inputs.fixture || 'tests/fixtures/sample_m1.csv' }}
 
-      - name: Validate fixture schema with pytest conftest
+      - name: Run focused data-quality tests
         run: |
-          pytest tests/conftest.py -v --tb=short || true
+          pytest tests/test_io.py tests/test_clean.py tests/test_validate.py -q

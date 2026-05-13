@@ -11,7 +11,7 @@ from typing import Any
 
 import pandas as pd
 
-# Acceptable median spread_pips band (spec §4 §6)
+# Acceptable median spread_pips band (spec sections 4 and 6)
 SPREAD_PIPS_MEDIAN_MIN = 1.5
 SPREAD_PIPS_MEDIAN_MAX = 3.0
 

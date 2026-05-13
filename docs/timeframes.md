@@ -86,7 +86,7 @@ noise significantly while retaining intraday structure.
 labelling. The workhorse for most quantitative finance research.
 
 **W1 / MN1:** Macro trend analysis, portfolio allocation signals. Few bars per
-year — useful as reference, not primary signal.
+year - useful as reference, not primary signal.
 
 ## Further reading
 

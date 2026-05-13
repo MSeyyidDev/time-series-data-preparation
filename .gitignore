@@ -51,7 +51,7 @@ Thumbs.db
 notebooks/.ipynb_checkpoints/
 *.ipynb
 
-# Data — never commit large raw or processed data files
+# Data - never commit large raw or processed data files
 data/raw/*
 data/interim/*
 data/processed/*
