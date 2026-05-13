@@ -21,6 +21,28 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "duckdb"
         update-types: ["version-update:semver-major"]
+      - dependency-name: "matplotlib"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "plotly"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "typer"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "rich"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "pytest"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "pytest-cov"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "ruff"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "mypy"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "jupyter"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "jupytext"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "pandas-stubs"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "github-actions"
     directory: "/"
