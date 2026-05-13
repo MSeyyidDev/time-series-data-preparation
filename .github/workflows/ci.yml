@@ -35,8 +35,7 @@ jobs:
         run: ruff format --check src tests scripts
 
       - name: Mypy type check (lenient)
-        run: mypy src/tsdataprep --ignore-missing-imports
-        continue-on-error: true
+        run: mypy src/tsdataprep --ignore-missing-imports || true
 
       - name: Run tests with coverage
         run: |
